@@ -1,0 +1,20 @@
+name: servidor
+description: API del seguimiento de ofertas de Radar móvil (Dart, shelf y MongoDB).
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.5
+
+dependencies:
+  http: ^1.6.0
+  jose: ^0.3.5+2
+  meta: ^1.19.0
+  mongo_dart: ^0.10.10
+  path: ^1.9.0
+  shelf: ^1.4.2
+  shelf_router: ^1.1.4
+
+dev_dependencies:
+  test: ^1.33.0
+  very_good_analysis: ^11.0.0

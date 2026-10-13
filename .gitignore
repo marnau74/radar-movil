@@ -1,0 +1,5 @@
+# Código generado por build_runner: se genera en local y en la CI (`dart run build_runner build`).
+*.g.dart
+*.freezed.dart
+
+.env

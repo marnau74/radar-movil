@@ -1,0 +1,3 @@
+tags:
+  # Pruebas que necesitan un MongoDB (RADAR_MOVIL_MONGO_PRUEBAS, por defecto localhost:27019).
+  mongo:
