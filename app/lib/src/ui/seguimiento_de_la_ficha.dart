@@ -69,12 +69,8 @@ class _Marco extends StatelessWidget {
   Widget build(BuildContext context) {
     final colores = Theme.of(context).colorScheme;
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color ?? colores.primaryContainer.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: colores.outlineVariant),
-      ),
-      child: Padding(padding: const EdgeInsets.all(14), child: child),
+      decoration: BoxDecoration(color: color ?? colores.surfaceContainer, borderRadius: BorderRadius.circular(12)),
+      child: Padding(padding: const EdgeInsets.fromLTRB(16, 12, 8, 12), child: child),
     );
   }
 }
@@ -95,7 +91,7 @@ class _Seguido extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Text('Tu seguimiento', style: tema.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+              Text('Tu seguimiento', style: tema.textTheme.titleSmall),
               const Spacer(),
               if (local.pendiente)
                 Tooltip(
@@ -105,8 +101,11 @@ class _Seguido extends ConsumerWidget {
               _MenuDelSeguimiento(local: local),
             ],
           ),
-          const SizedBox(height: 4),
-          _SelectorDeEtapa(seguimiento: s),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: _SelectorDeEtapa(seguimiento: s),
+          ),
           if (s.responsable != null || s.fechaInterna != null) ...[
             const SizedBox(height: 8),
             Wrap(
@@ -137,27 +136,148 @@ class _Seguido extends ConsumerWidget {
   }
 }
 
-/// El cambio de etapa es un menú, no un tablero que se arrastra: en el móvil se usa mejor y es accesible.
+/// El cambio de etapa: los tres pasos de una oferta en marcha como una línea de progreso, y el resultado aparte.
+/// Un toque basta; nada de tableros que se arrastran, que en el móvil se usan peor y no son accesibles.
 class _SelectorDeEtapa extends ConsumerWidget {
   const _SelectorDeEtapa({required this.seguimiento});
+
+  static const List<Etapa> _pasos = [Etapa.interesa, Etapa.preparando, Etapa.presentada];
+  static const List<Etapa> _resultados = [Etapa.ganada, Etapa.perdida, Etapa.descartada];
 
   final Seguimiento seguimiento;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => DropdownMenu<Etapa>(
-    initialSelection: seguimiento.etapa,
-    label: const Text('Etapa'),
-    expandedInsets: EdgeInsets.zero,
-    requestFocusOnTap: false,
-    dropdownMenuEntries: [for (final e in Etapa.values) DropdownMenuEntry(value: e, label: e.nombre)],
-    onSelected: (etapa) {
-      if (etapa == null || etapa == seguimiento.etapa) return;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tema = Theme.of(context);
+    final actual = seguimiento.etapa;
+    // Si ya está cerrada, los tres pasos se dan por recorridos.
+    final alcanzado = actual.cerrada ? _pasos.length - 1 : _pasos.indexOf(actual);
+
+    void elegir(Etapa etapa) {
+      if (etapa == actual) return;
       final ahora = ref.read(relojProvider)();
       unawaited(
         _ejecutar(context, () => ref.read(sincronizacionProvider.notifier).guardar(seguimiento.conEtapa(etapa, ahora))),
       );
-    },
-  );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final (i, paso) in _pasos.indexed)
+              Expanded(
+                child: _Paso(
+                  etapa: paso,
+                  hecho: i <= alcanzado,
+                  // El tramo de línea que llega a este paso (desde el anterior) y el que sale hacia el siguiente.
+                  lineaAntes: i == 0 ? null : i <= alcanzado,
+                  lineaDespues: i == _pasos.length - 1 ? null : i < alcanzado,
+                  actual: paso == actual,
+                  alTocar: () => elegir(paso),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Text('Resultado', style: tema.textTheme.bodySmall?.copyWith(color: context.estados.textoSuave)),
+        const SizedBox(height: 6),
+        SizedBox(
+          width: double.infinity,
+          child: SegmentedButton<Etapa>(
+            segments: [for (final r in _resultados) ButtonSegment(value: r, label: Text(r.nombre))],
+            selected: {if (actual.cerrada) actual},
+            emptySelectionAllowed: true,
+            showSelectedIcon: false,
+            style: SegmentedButton.styleFrom(
+              backgroundColor: tema.colorScheme.surface,
+              visualDensity: VisualDensity.compact,
+            ),
+            onSelectionChanged: (elegidas) {
+              // Tocar el resultado ya elegido no lo quita: para reabrir la oferta se toca uno de los pasos.
+              if (elegidas.isNotEmpty) elegir(elegidas.first);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Paso extends StatelessWidget {
+  const _Paso({
+    required this.etapa,
+    required this.hecho,
+    required this.lineaAntes,
+    required this.lineaDespues,
+    required this.actual,
+    required this.alTocar,
+  });
+
+  final Etapa etapa;
+  final bool hecho;
+
+  /// Nulo si no hay tramo (primer o último paso); si no, si ese tramo está recorrido.
+  final bool? lineaAntes;
+  final bool? lineaDespues;
+  final bool actual;
+  final VoidCallback alTocar;
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    final color = hecho ? tema.colorScheme.primary : tema.colorScheme.outline;
+    Widget tramo({required bool? recorrido}) => Expanded(
+      child: recorrido == null
+          ? const SizedBox.shrink()
+          : Container(height: 2, color: recorrido ? tema.colorScheme.primary : tema.colorScheme.outlineVariant),
+    );
+    return Semantics(
+      button: true,
+      selected: actual,
+      label: 'Etapa ${etapa.nombre}',
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: alTocar,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  tramo(recorrido: lineaAntes),
+                  Container(
+                    width: 16,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: hecho ? color : tema.colorScheme.surfaceContainer,
+                      border: Border.all(color: color, width: 2),
+                    ),
+                    child: actual ? Icon(Icons.circle, size: 6, color: tema.colorScheme.onPrimary) : null,
+                  ),
+                  tramo(recorrido: lineaDespues),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                etapa.corto,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: tema.textTheme.labelMedium?.copyWith(
+                  color: actual ? tema.colorScheme.onSurface : context.estados.textoSuave,
+                  fontWeight: actual ? FontWeight.w600 : FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _MenuDelSeguimiento extends ConsumerWidget {
@@ -272,7 +392,7 @@ class _Version extends StatelessWidget {
           children: [
             Text(titulo, style: tema.textTheme.labelLarge?.copyWith(color: context.estados.textoSuave)),
             const SizedBox(height: 6),
-            EtiquetaDeEtapa(s.etapa),
+            TextoDeEtapa(s.etapa),
             if (s.responsable != null) ...[const SizedBox(height: 4), Text('Responsable: ${s.responsable}')],
             if (s.notas.isNotEmpty) ...[
               const SizedBox(height: 4),

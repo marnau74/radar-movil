@@ -5,7 +5,6 @@ import 'package:radar_movil/src/rutas.dart';
 import 'package:radar_movil/src/ui/comunes.dart';
 import 'package:radar_movil/src/ui/cuenta.dart';
 import 'package:radar_movil/src/ui/formato.dart';
-import 'package:radar_movil/src/ui/tema.dart';
 
 /// Lo que han encontrado las alertas que el usuario tiene en el radar (las alertas se configuran en la web).
 class PantallaAvisos extends ConsumerWidget {
@@ -42,34 +41,40 @@ class PantallaAvisos extends ConsumerWidget {
               AsyncValue(:final value?) => RefreshIndicator(
                 onRefresh: () => ref.refresh(avisosDelRadarProvider.future),
                 child: ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                  padding: const EdgeInsets.only(bottom: 24),
                   itemCount: value.elementos.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 14),
+                  separatorBuilder: (_, _) => const Divider(indent: 74),
                   itemBuilder: (context, i) {
                     final aviso = value.elementos[i];
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Qué alerta la ha encontrado y cuándo, alineado con el texto de la fila.
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 6, left: 2),
+                          padding: const EdgeInsets.fromLTRB(74, 12, 16, 0),
                           child: Row(
                             children: [
                               if (!aviso.leido) ...[
-                                Icon(Icons.circle, size: 8, color: Theme.of(context).colorScheme.primary),
+                                Icon(
+                                  Icons.circle,
+                                  size: 8,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  semanticLabel: 'Sin leer',
+                                ),
                                 const SizedBox(width: 6),
                               ],
                               Expanded(
                                 child: Text(
                                   '${aviso.alerta} · ${fecha(aviso.creadoEn)}',
                                   style: Theme.of(context).textTheme.labelMedium
-                                      ?.copyWith(color: context.estados.textoSuave),
+                                      ?.copyWith(color: Theme.of(context).colorScheme.primary),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        TarjetaDeLicitacion(
-                          licitacion: aviso.licitacion,
+                        FilaDeLicitacion.deResumen(
+                          aviso.licitacion,
                           alTocar: () => RutaFicha(id: aviso.licitacion.id).push<void>(context),
                         ),
                       ],

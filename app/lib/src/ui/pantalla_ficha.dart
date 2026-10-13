@@ -70,27 +70,34 @@ class _Contenido extends ConsumerWidget {
     final tema = Theme.of(context);
     final f = ficha;
     final suave = tema.textTheme.bodyMedium?.copyWith(color: context.estados.textoSuave);
+    final detalles = [
+      f.estado.nombre,
+      if (f.tipoContrato != null) f.tipoContrato!.nombre,
+      if (f.financiacionUe) 'Fondos UE',
+    ].join(' · ');
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
+      padding: const EdgeInsets.only(bottom: 32),
       children: [
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: [
-            EtiquetaDePlazo(f.plazoPresentacion, anulada: f.anulada),
-            Etiqueta(f.estado.nombre, color: context.estados.cerrada, fondo: context.estados.cerradaFondo),
-            if (f.financiacionUe)
-              Etiqueta('Fondos UE', color: tema.colorScheme.primary, fondo: tema.colorScheme.primaryContainer),
-          ],
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(f.organo.nombre, style: suave),
+              const SizedBox(height: 6),
+              Text(f.titulo, style: tema.textTheme.titleLarge?.copyWith(height: 1.25)),
+              const SizedBox(height: 8),
+              Text(
+                [detalles, if (f.expediente != null) 'Exp. ${f.expediente}'].join(' · '),
+                style: tema.textTheme.bodySmall?.copyWith(color: context.estados.textoSuave),
+              ),
+              const SizedBox(height: 20),
+              _CifrasClave(ficha: f),
+              const SizedBox(height: 20),
+              SeguimientoDeLaFicha(ficha: f),
+            ],
+          ),
         ),
-        const SizedBox(height: 12),
-        Text(f.titulo, style: tema.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600, height: 1.3)),
-        const SizedBox(height: 6),
-        Text(f.organo.nombre, style: suave),
-        if (f.expediente != null) Text('Expediente ${f.expediente}', style: suave),
-        const SizedBox(height: 16),
-        SeguimientoDeLaFicha(ficha: f),
-        const SizedBox(height: 16),
         _Seccion(
           titulo: 'Datos',
           hijos: [
@@ -164,27 +171,65 @@ class _Seccion extends StatelessWidget {
   final List<Widget> hijos;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 16),
-    child: Card(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Semantics(
-              header: true,
-              child: Text(titulo, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
-            ),
-            const SizedBox(height: 6),
-            ...hijos,
-          ],
-        ),
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const SizedBox(height: 8),
+      Encabezado(titulo),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: hijos),
       ),
-    ),
+    ],
   );
 }
 
+/// El importe y el cierre del plazo, grandes y juntos: es lo que decide si merece la pena presentarse.
+class _CifrasClave extends ConsumerWidget {
+  const _CifrasClave({required this.ficha});
+
+  final FichaDeLicitacion ficha;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tema = Theme.of(context);
+    final grande = tema.textTheme.titleLarge?.merge(cifras).copyWith(letterSpacing: -0.3);
+    final pie = tema.textTheme.bodySmall?.copyWith(color: context.estados.textoSuave);
+    final plazo = ficha.plazoPresentacion?.toLocal();
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: Semantics(
+              label: 'Importe sin IVA: ${euros(ficha.importeSinIva)}',
+              excludeSemantics: true,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(euros(ficha.importeSinIva), style: grande),
+                  Text('sin IVA', style: pie),
+                ],
+              ),
+            ),
+          ),
+          const VerticalDivider(width: 32),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(plazo == null ? 'Sin plazo' : fechaCorta(plazo), style: grande),
+                if (ficha.anulada) Text('Anulada', style: pie) else TextoDePlazo(ficha.plazoPresentacion),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Una fila de datos: el nombre a la izquierda, en gris, y el valor a su lado; como una tabla, no como un formulario.
 class _Dato extends StatelessWidget {
   const _Dato(this.nombre, this.valor, {this.cifra = false, this.derecha});
 
@@ -196,24 +241,21 @@ class _Dato extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
+    final estilo = cifra ? tema.textTheme.bodyMedium?.merge(cifras) : tema.textTheme.bodyMedium;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 7),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(nombre, style: tema.textTheme.labelMedium?.copyWith(color: context.estados.textoSuave)),
-                const SizedBox(height: 2),
-                Text(valor, style: cifra ? tema.textTheme.bodyLarge?.merge(cifras) : tema.textTheme.bodyMedium),
-              ],
-            ),
+          SizedBox(
+            width: 116,
+            child: Text(nombre, style: tema.textTheme.bodyMedium?.copyWith(color: context.estados.textoSuave)),
           ),
+          const SizedBox(width: 12),
+          Expanded(child: Text(valor, style: estilo)),
           if (derecha != null) ...[
             const SizedBox(width: 12),
-            Text(derecha!, style: tema.textTheme.bodyMedium?.merge(cifras)),
+            Text(derecha!, style: tema.textTheme.bodyMedium?.merge(cifras).copyWith(fontWeight: FontWeight.w500)),
           ],
         ],
       ),

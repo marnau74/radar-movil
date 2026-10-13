@@ -17,6 +17,9 @@ enum Etapa {
 
   final String nombre;
 
+  /// El nombre en una palabra, para las listas y el selector de etapas.
+  String get corto => this == preparando ? 'Preparando' : nombre;
+
   /// Ganada, perdida y descartada cierran el seguimiento: ya no hay plazos que avisar.
   bool get cerrada => this == ganada || this == perdida || this == descartada;
 }

@@ -44,3 +44,14 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  # IBM Plex Sans (licencia OFL, en assets/fuentes/OFL.txt).
+  fonts:
+    - family: IBM Plex Sans
+      fonts:
+        - asset: assets/fuentes/IBMPlexSans-Regular.ttf
+        - asset: assets/fuentes/IBMPlexSans-Medium.ttf
+          weight: 500
+        - asset: assets/fuentes/IBMPlexSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fuentes/IBMPlexSans-Bold.ttf
+          weight: 700

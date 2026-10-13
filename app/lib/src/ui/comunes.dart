@@ -99,149 +99,242 @@ Future<void> iniciarSesion(BuildContext context, WidgetRef ref) async {
   }
 }
 
-/// Una etiqueta pequeña de color apagado, como las de la web del radar.
-class Etiqueta extends StatelessWidget {
-  const Etiqueta(this.texto, {required this.color, required this.fondo, this.icono, super.key});
-
-  final String texto;
-  final Color color;
-  final Color fondo;
-  final IconData? icono;
-
-  @override
-  Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(color: fondo, borderRadius: BorderRadius.circular(4)),
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icono != null) ...[Icon(icono, size: 14, color: color), const SizedBox(width: 4)],
-          Flexible(
-            child: Text(
-              texto,
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(color: color, fontWeight: FontWeight.w600),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
+/// El color de lo que queda de plazo: ámbar si cierra en tres días o menos, verde si hay margen, gris si ya ha
+/// cerrado o no hay plazo.
+Color colorDePlazo(BuildContext context, Urgencia urgencia) {
+  final c = context.estados;
+  return switch (urgencia) {
+    Urgencia.cerrado || Urgencia.sinPlazo => c.textoSuave,
+    Urgencia.hoy || Urgencia.pronto => c.pendiente,
+    Urgencia.holgado => c.enPlazo,
+  };
 }
 
-class EtiquetaDePlazo extends ConsumerWidget {
-  const EtiquetaDePlazo(this.plazo, {this.anulada = false, super.key});
+Color colorDeEtapa(BuildContext context, Etapa etapa) => switch (etapa) {
+  Etapa.ganada => context.estados.enPlazo,
+  Etapa.perdida || Etapa.descartada => context.estados.textoSuave,
+  _ => Theme.of(context).colorScheme.primary,
+};
+
+/// El día en que cierra el plazo, como la hoja de un calendario: lo primero que se mira de una licitación.
+class SelloDePlazo extends ConsumerWidget {
+  const SelloDePlazo(this.plazo, {this.anulada = false, super.key});
 
   final DateTime? plazo;
   final bool anulada;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final c = context.estados;
-    if (anulada) return Etiqueta('Anulada', color: c.anulada, fondo: c.anuladaFondo);
+    final tema = Theme.of(context);
     final restante = plazoRestante(plazo, ref.watch(relojProvider)());
-    final (color, fondo) = switch (restante.urgencia) {
-      Urgencia.cerrado || Urgencia.sinPlazo => (c.cerrada, c.cerradaFondo),
-      Urgencia.hoy || Urgencia.pronto => (c.pendiente, c.pendienteFondo),
-      Urgencia.holgado => (c.enPlazo, c.enPlazoFondo),
-    };
+    final color = anulada ? context.estados.anulada : colorDePlazo(context, restante.urgencia);
+    final local = plazo?.toLocal();
     return Semantics(
-      label: 'Plazo: ${restante.texto}',
+      label: anulada ? 'Anulada' : 'Plazo: ${restante.texto}',
       excludeSemantics: true,
-      child: Etiqueta(restante.texto, color: color, fondo: fondo, icono: Icons.schedule),
+      child: SizedBox(
+        width: 44,
+        child: Column(
+          children: [
+            Text(
+              local == null ? '—' : '${local.day}',
+              style: tema.textTheme.titleLarge?.merge(cifras).copyWith(color: color, height: 1.1),
+            ),
+            Text(
+              local == null ? 'SIN PLAZO' : mesCorto(local),
+              style: tema.textTheme.labelSmall?.copyWith(color: color, letterSpacing: 0.6, fontSize: 10),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
 
-class EtiquetaDeEtapa extends StatelessWidget {
-  const EtiquetaDeEtapa(this.etapa, {super.key});
+/// Lo que queda de plazo, en texto y con su color («Cierra mañana a las 14:00»).
+class TextoDePlazo extends ConsumerWidget {
+  const TextoDePlazo(this.plazo, {super.key});
+
+  final DateTime? plazo;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final restante = plazoRestante(plazo, ref.watch(relojProvider)());
+    return Text(
+      restante.texto,
+      style: Theme.of(context).textTheme.labelLarge?.copyWith(color: colorDePlazo(context, restante.urgencia)),
+    );
+  }
+}
+
+/// La etapa de un seguimiento: un punto de color y su nombre.
+class TextoDeEtapa extends StatelessWidget {
+  const TextoDeEtapa(this.etapa, {super.key});
 
   final Etapa etapa;
 
   @override
   Widget build(BuildContext context) {
-    final c = context.estados;
-    final colores = Theme.of(context).colorScheme;
-    final (color, fondo) = switch (etapa) {
-      Etapa.ganada => (c.enPlazo, c.enPlazoFondo),
-      Etapa.perdida || Etapa.descartada => (c.cerrada, c.cerradaFondo),
-      _ => (colores.primary, colores.primaryContainer),
-    };
-    return Etiqueta(etapa.nombre, color: color, fondo: fondo, icono: Icons.flag_outlined);
+    final color = colorDeEtapa(context, etapa);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          child: const SizedBox.square(dimension: 7),
+        ),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(
+            etapa.corto,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(color: color),
+          ),
+        ),
+      ],
+    );
   }
 }
 
-/// Una licitación en una lista. Si se sigue, enseña en qué etapa está.
-class TarjetaDeLicitacion extends StatelessWidget {
-  const TarjetaDeLicitacion({required this.licitacion, required this.alTocar, this.etapa, super.key});
+/// Una licitación en una lista: el sello del plazo a la izquierda y, a la derecha, órgano, título, importe y lugar.
+/// Sin caja alrededor: las filas se separan con una línea fina.
+class FilaDeLicitacion extends ConsumerWidget {
+  const FilaDeLicitacion({
+    required this.titulo,
+    required this.organo,
+    required this.alTocar,
+    this.importe,
+    this.plazo,
+    this.lugar,
+    this.anulada = false,
+    this.etapa,
+    this.indicador,
+    super.key,
+  });
 
-  final LicitacionResumen licitacion;
+  factory FilaDeLicitacion.deResumen(LicitacionResumen l, {required VoidCallback alTocar, Etapa? etapa, Key? key}) =>
+      FilaDeLicitacion(
+        key: key,
+        titulo: l.titulo,
+        organo: l.organo,
+        importe: l.importeSinIva,
+        plazo: l.plazoPresentacion,
+        lugar: l.lugar,
+        anulada: l.anulada,
+        etapa: etapa,
+        alTocar: alTocar,
+      );
+
+  final String titulo;
+  final String organo;
+  final double? importe;
+  final DateTime? plazo;
+  final String? lugar;
+  final bool anulada;
   final Etapa? etapa;
+
+  /// Un icono pequeño junto al título (pendiente de subir, conflicto).
+  final Widget? indicador;
   final VoidCallback alTocar;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tema = Theme.of(context);
-    final l = licitacion;
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: alTocar,
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l.titulo,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: tema.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600, height: 1.3),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                l.organo,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: tema.textTheme.bodySmall?.copyWith(color: context.estados.textoSuave),
-              ),
-              const SizedBox(height: 10),
-              Row(
+    final suave = tema.textTheme.bodySmall?.copyWith(color: context.estados.textoSuave);
+    final restante = plazoRestante(plazo, ref.watch(relojProvider)());
+    final urgente = restante.urgencia == Urgencia.hoy || restante.urgencia == Urgencia.pronto;
+    final String detalle;
+    final TextStyle? estiloDelDetalle;
+    if (anulada) {
+      detalle = 'Anulada';
+      estiloDelDetalle = suave?.copyWith(color: context.estados.anulada, fontWeight: FontWeight.w600);
+    } else if (urgente) {
+      detalle = restante.texto;
+      estiloDelDetalle = suave?.copyWith(color: context.estados.pendiente, fontWeight: FontWeight.w600);
+    } else {
+      detalle = lugar ?? '';
+      estiloDelDetalle = suave;
+    }
+    return InkWell(
+      onTap: alTocar,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SelloDePlazo(plazo, anulada: anulada),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Semantics(
-                    label: 'Importe sin IVA: ${euros(l.importeSinIva)}',
-                    excludeSemantics: true,
-                    child: Text(
-                      euros(l.importeSinIva),
-                      style: tema.textTheme.titleSmall?.merge(cifras).copyWith(fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                  if (l.lugar != null) ...[
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        l.lugar!,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: tema.textTheme.bodySmall?.copyWith(color: context.estados.textoSuave),
+                  Text(organo, maxLines: 1, overflow: TextOverflow.ellipsis, style: suave),
+                  const SizedBox(height: 3),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          titulo,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: tema.textTheme.titleSmall?.copyWith(
+                            decoration: anulada ? TextDecoration.lineThrough : null,
+                          ),
+                        ),
                       ),
-                    ),
-                  ] else
-                    const Spacer(),
+                      if (indicador != null) ...[const SizedBox(width: 8), indicador!],
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Semantics(
+                        label: 'Importe sin IVA: ${euros(importe)}',
+                        excludeSemantics: true,
+                        child: Text(
+                          euros(importe),
+                          style: tema.textTheme.bodyMedium?.merge(cifras).copyWith(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(detalle, maxLines: 1, overflow: TextOverflow.ellipsis, style: estiloDelDetalle),
+                      ),
+                      if (etapa != null) Flexible(child: TextoDeEtapa(etapa!)),
+                    ],
+                  ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: [
-                  EtiquetaDePlazo(l.plazoPresentacion, anulada: l.anulada),
-                  if (etapa != null) EtiquetaDeEtapa(etapa!),
-                ],
-              ),
-            ],
-          ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Un encabezado de sección, pequeño y en mayúsculas, como los de los ajustes del sistema.
+class Encabezado extends StatelessWidget {
+  const Encabezado(this.texto, {this.detalle, super.key});
+
+  final String texto;
+  final String? detalle;
+
+  @override
+  Widget build(BuildContext context) {
+    final estilo = Theme.of(context).textTheme.labelSmall?.copyWith(color: context.estados.textoSuave);
+    return Semantics(
+      header: true,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 22, 16, 6),
+        child: Row(
+          children: [
+            Expanded(child: Text(texto.toUpperCase(), style: estilo)),
+            if (detalle != null) Text(detalle!, style: estilo?.merge(cifras)),
+          ],
         ),
       ),
     );

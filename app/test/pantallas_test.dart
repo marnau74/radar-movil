@@ -28,11 +28,11 @@ void main() {
     final e = Entorno();
     await e.arrancar(tester);
 
-    expect(find.text('4 licitaciones'), findsOneWidget);
-    expect(find.text('Sin plazo publicado'), findsNWidgets(2));
+    expect(find.text('4 LICITACIONES'), findsOneWidget);
+    expect(find.text('SIN PLAZO'), findsNWidgets(2));
     expect(find.textContaining('Instituto Social de la Marina'), findsWidgets);
     expect(find.text('47.775 €'), findsOneWidget);
-    expect(find.text('Cierra el 19 oct 2026'), findsOneWidget);
+    expect(find.text('OCT'), findsOneWidget);
   });
 
   testWidgets('escribir busca al dejar de teclear y el filtro de plazo va en la petición', (tester) async {
@@ -84,7 +84,7 @@ void main() {
     expect(find.textContaining('Contratar la prestación de servicios'), findsOneWidget);
     expect(find.textContaining('Inicia sesión para seguir'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('Pliego de cláusulas administrativas'), 300);
-    expect(find.text('3 lotes'), findsOneWidget);
+    expect(find.text('3 LOTES'), findsOneWidget);
   });
 
   testWidgets('seguir, cambiar de etapa y verlo en el embudo', (tester) async {
@@ -101,9 +101,9 @@ void main() {
     final avisos = verify(() => e.notificador.reprogramar(captureAny())).captured.last as List<AvisoProgramado>;
     expect(avisos.map((a) => a.tipo), [TipoDeAviso.tresDias, TipoDeAviso.unDia]);
 
-    await tester.tap(find.byType(DropdownMenu<Etapa>));
+    await tester.scrollUntilVisible(find.text('Preparando'), 200);
     await asentar(tester);
-    await tester.tap(find.text('Preparando la oferta').last);
+    await tester.tap(find.text('Preparando'));
     await asentar(tester);
     final subido = verify(() => e.api.guardar(captureAny())).captured.last as Seguimiento;
     expect(subido.etapa, Etapa.preparando);
@@ -113,7 +113,7 @@ void main() {
     await asentar(tester);
     await tester.tap(find.text('Seguimiento'));
     await asentar(tester);
-    expect(find.text('Preparando la oferta · 1'), findsOneWidget);
+    expect(find.text('Preparando 1'), findsOneWidget);
     expect(find.text('47.775 €'), findsWidgets);
   });
 

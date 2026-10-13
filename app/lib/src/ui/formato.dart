@@ -16,6 +16,21 @@ String fecha(DateTime? valor) => valor == null ? '—' : _fecha.format(valor.toL
 
 String fechaHora(DateTime? valor) => valor == null ? '—' : _fechaHora.format(valor.toLocal());
 
+final _mes = DateFormat('MMM', 'es_ES');
+
+/// `OCT`, sin el punto de la abreviatura.
+String mesCorto(DateTime fecha) => _mes.format(fecha).replaceAll('.', '').toUpperCase();
+
+final _entero = NumberFormat.decimalPattern('es_ES');
+
+/// `1.234`.
+String entero(int valor) => _entero.format(valor);
+
+final _fechaCorta = DateFormat('d MMM, HH:mm', 'es_ES');
+
+/// `19 oct, 23:59`.
+String fechaCorta(DateTime valor) => _fechaCorta.format(valor.toLocal());
+
 String porcentaje(double valor) => _porcentaje.format(valor);
 
 /// Cuánto le queda al plazo de presentación.
@@ -34,6 +49,6 @@ enum Urgencia { sinPlazo, cerrado, hoy, pronto, holgado }
     0 => (texto: 'Cierra hoy a las $hora', urgencia: Urgencia.hoy),
     1 => (texto: 'Cierra mañana a las $hora', urgencia: Urgencia.pronto),
     < 4 => (texto: 'Cierra en $dias días', urgencia: Urgencia.pronto),
-    _ => (texto: 'Cierra el ${_fecha.format(local)}', urgencia: Urgencia.holgado),
+    _ => (texto: 'Cierra en $dias días', urgencia: Urgencia.holgado),
   };
 }

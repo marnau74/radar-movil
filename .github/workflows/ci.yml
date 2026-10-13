@@ -46,6 +46,9 @@ jobs:
   app:
     name: App (Flutter)
     runs-on: ubuntu-latest
+    # Las golden y las capturas se generan con la hora peninsular: los plazos se ven en hora local.
+    env:
+      TZ: Europe/Madrid
     defaults:
       run:
         working-directory: app

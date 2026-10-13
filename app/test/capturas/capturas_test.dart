@@ -13,11 +13,12 @@ import 'package:radar_movil/src/avisos/avisos_de_plazo.dart';
 import 'package:radar_movil/src/modelos/licitacion.dart';
 import 'package:radar_movil/src/modelos/seguimiento.dart';
 import 'package:radar_movil/src/red/apis.dart';
+import 'package:radar_movil/src/ui/tema.dart';
 
 import '../ayudas.dart';
 import '../entorno.dart';
 
-/// Las capturas del README, dibujadas con Roboto y los iconos de Material (los de Flutter) a partir de respuestas
+/// Las capturas del README, dibujadas con la fuente de la app (IBM Plex Sans) y los iconos de Material a partir de respuestas
 /// reales del radar. No comprueban nada: se generan a mano, en Linux, con
 /// `flutter test --run-skipped --tags capturas --update-goldens`.
 void main() {
@@ -28,17 +29,21 @@ void main() {
     registerFallbackValue(seguimiento(0));
     registerFallbackValue(<AvisoProgramado>[]);
     registerFallbackValue(Orden.relevancia);
-    final fuentes = '${Platform.environment['FLUTTER_ROOT']}/bin/cache/artifacts/material_fonts';
     Future<void> cargar(String familia, List<String> archivos) async {
       final cargador = FontLoader(familia);
       for (final archivo in archivos) {
-        cargador.addFont(Future.value(ByteData.sublistView(File('$fuentes/$archivo').readAsBytesSync())));
+        cargador.addFont(Future.value(ByteData.sublistView(File(archivo).readAsBytesSync())));
       }
       await cargador.load();
     }
 
-    await cargar('Roboto', ['Roboto-Regular.ttf', 'Roboto-Medium.ttf', 'Roboto-Bold.ttf']);
-    await cargar('MaterialIcons', ['MaterialIcons-Regular.otf']);
+    await cargar(fuente, [
+      for (final peso in ['Regular', 'Medium', 'SemiBold', 'Bold']) 'assets/fuentes/IBMPlexSans-$peso.ttf',
+    ]);
+    // Los iconos de Material vienen con Flutter.
+    await cargar('MaterialIcons', [
+      '${Platform.environment['FLUTTER_ROOT']}/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
+    ]);
   });
 
   /// Un embudo con varias licitaciones reales de la búsqueda, cada una en una etapa.

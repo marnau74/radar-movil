@@ -13,7 +13,7 @@ import 'package:radar_movil/src/ui/tema.dart';
 
 import '../ayudas.dart';
 
-/// La tarjeta de una licitación en claro y en oscuro. Las imágenes de referencia se generan en Linux (como en la CI):
+/// La fila de una licitación en claro y en oscuro. Las imágenes de referencia se generan en Linux (como en la CI):
 /// `flutter test --tags golden --update-goldens` dentro de la imagen de Docker de Flutter (ver el README).
 void main() {
   setUpAll(() => initializeDateFormatting('es_ES'));
@@ -21,7 +21,7 @@ void main() {
   final licitaciones = PaginaDeLicitaciones.fromJson(datos('busqueda.json')).elementos;
 
   for (final (nombre, tema) in [('clara', temaClaro()), ('oscura', temaOscuro())]) {
-    testWidgets('tarjeta $nombre', (tester) async {
+    testWidgets('fila $nombre', (tester) async {
       tester.view
         ..physicalSize = const Size(1080, 1500)
         ..devicePixelRatio = 3;
@@ -34,18 +34,18 @@ void main() {
             theme: tema,
             home: Scaffold(
               body: ListView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 children: [
-                  TarjetaDeLicitacion(licitacion: licitaciones[0], alTocar: () {}, etapa: Etapa.preparando),
-                  const SizedBox(height: 10),
-                  TarjetaDeLicitacion(licitacion: licitaciones[1], alTocar: () {}),
+                  FilaDeLicitacion.deResumen(licitaciones[2], alTocar: () {}, etapa: Etapa.preparando),
+                  const Divider(indent: 74),
+                  FilaDeLicitacion.deResumen(licitaciones[0], alTocar: () {}),
                 ],
               ),
             ),
           ),
         ),
       );
-      await expectLater(find.byType(ListView), matchesGoldenFile('tarjeta_$nombre.png'));
+      await expectLater(find.byType(ListView), matchesGoldenFile('fila_$nombre.png'));
     });
   }
 }

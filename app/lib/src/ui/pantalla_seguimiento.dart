@@ -80,33 +80,29 @@ class _PantallaSeguimientoState extends ConsumerState<PantallaSeguimiento> {
         const SliverToBoxAdapter(child: _AvisoDeSincronizacion()),
         SliverToBoxAdapter(child: _Resumen(embudo: embudo)),
         SliverToBoxAdapter(
-          child: _FiltroDeEtapas(
+          child: _Pestanas(
             embudo: embudo,
+            total: todos.length,
             elegida: _filtro,
-            alElegir: (etapa) => setState(() => _filtro = etapa == _filtro ? null : etapa),
+            alElegir: (etapa) => setState(() => _filtro = etapa),
           ),
         ),
+        const SliverToBoxAdapter(child: Divider()),
         for (final etapa in etapas) ...[
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Semantics(
-                header: true,
-                child: Text(
-                  etapa.nombre,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(color: context.estados.textoSuave),
-                ),
+            child: Encabezado(
+              etapa.nombre,
+              detalle: euros(
+                visibles
+                    .where((s) => s.seguimiento.etapa == etapa)
+                    .fold<double>(0, (suma, s) => suma + (s.seguimiento.resumen.importe ?? 0)),
               ),
             ),
           ),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverList.separated(
-              itemCount: visibles.where((s) => s.seguimiento.etapa == etapa).length,
-              separatorBuilder: (_, _) => const SizedBox(height: 8),
-              itemBuilder: (context, i) =>
-                  _Fila(local: visibles.where((s) => s.seguimiento.etapa == etapa).elementAt(i)),
-            ),
+          SliverList.separated(
+            itemCount: visibles.where((s) => s.seguimiento.etapa == etapa).length,
+            separatorBuilder: (_, _) => const Divider(indent: 74),
+            itemBuilder: (context, i) => _Fila(local: visibles.where((s) => s.seguimiento.etapa == etapa).elementAt(i)),
           ),
         ],
         const SliverToBoxAdapter(child: SizedBox(height: 24)),
@@ -163,31 +159,33 @@ class _Resumen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    final suave = tema.textTheme.bodyMedium?.copyWith(color: context.estados.textoSuave);
+    final ganadas = embudo.cifras(Etapa.ganada).cuantas;
+    final resueltas = ganadas + embudo.cifras(Etapa.perdida).cuantas;
     final tasa = embudo.tasaDeExito;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-      // Las dos cifras, igual de altas aunque una tenga más texto.
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    final abiertas = embudo.abiertas == 1 ? '1 oferta abierta' : '${embudo.abiertas} ofertas abiertas';
+    final exito = tasa == null ? 'aún ninguna resuelta' : '$ganadas de $resueltas ganadas (${porcentaje(tasa)})';
+    return Semantics(
+      label: 'En juego: ${euros(embudo.importeEnJuego)} en $abiertas; $exito',
+      excludeSemantics: true,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: _Cifra(
-                nombre: 'En juego',
-                valor: euros(embudo.importeEnJuego),
-                detalle: '${embudo.abiertas} abiertas',
-              ),
+            Text('EN JUEGO', style: tema.textTheme.labelSmall?.copyWith(color: context.estados.textoSuave)),
+            const SizedBox(height: 2),
+            Text(
+              euros(embudo.importeEnJuego),
+              style: tema.textTheme.displaySmall
+                  ?.merge(cifras)
+                  .copyWith(fontWeight: FontWeight.w600, letterSpacing: -1, color: tema.colorScheme.onSurface),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _Cifra(
-                nombre: 'Tasa de éxito',
-                valor: tasa == null ? '—' : porcentaje(tasa),
-                detalle:
-                    '${embudo.cifras(Etapa.ganada).cuantas} ganadas de '
-                    '${embudo.cifras(Etapa.ganada).cuantas + embudo.cifras(Etapa.perdida).cuantas} resueltas',
-              ),
-            ),
+            const SizedBox(height: 2),
+            Text('en $abiertas · $exito', style: suave),
+            const SizedBox(height: 16),
+            _Barra(embudo: embudo),
           ],
         ),
       ),
@@ -195,38 +193,108 @@ class _Resumen extends StatelessWidget {
   }
 }
 
-class _Cifra extends StatelessWidget {
-  const _Cifra({required this.nombre, required this.valor, required this.detalle});
+/// Cuántas hay en cada etapa, como una barra repartida: se ve de un vistazo dónde se acumulan las ofertas.
+class _Barra extends StatelessWidget {
+  const _Barra({required this.embudo});
 
-  final String nombre;
-  final String valor;
-  final String detalle;
+  final Embudo embudo;
+
+  @override
+  Widget build(BuildContext context) {
+    final primario = Theme.of(context).colorScheme.primary;
+    final colores = {
+      Etapa.interesa: primario.withValues(alpha: 0.3),
+      Etapa.preparando: primario.withValues(alpha: 0.6),
+      Etapa.presentada: primario,
+      Etapa.ganada: context.estados.enPlazo,
+      Etapa.perdida: context.estados.textoSuave.withValues(alpha: 0.5),
+      Etapa.descartada: context.estados.textoSuave.withValues(alpha: 0.25),
+    };
+    final etapas = Etapa.values.where((e) => embudo.cifras(e).cuantas > 0).toList();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(4),
+      child: SizedBox(
+        height: 8,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final (i, etapa) in etapas.indexed) ...[
+              if (i > 0) const SizedBox(width: 2),
+              Expanded(
+                flex: embudo.cifras(etapa).cuantas,
+                child: ColoredBox(color: colores[etapa]!),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Pestañas de texto con el número de cada etapa; solo las que tienen algo.
+class _Pestanas extends StatelessWidget {
+  const _Pestanas({required this.embudo, required this.total, required this.elegida, required this.alElegir});
+
+  final Embudo embudo;
+  final int total;
+  final Etapa? elegida;
+  final ValueChanged<Etapa?> alElegir;
+
+  @override
+  Widget build(BuildContext context) {
+    final etapas = Etapa.values.where((e) => embudo.cifras(e).cuantas > 0);
+    return SizedBox(
+      height: 52,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.fromLTRB(8, 12, 8, 0),
+        children: [
+          _Pestana(texto: 'Todas $total', elegida: elegida == null, alTocar: () => alElegir(null)),
+          for (final e in etapas)
+            _Pestana(
+              texto: '${e.corto} ${embudo.cifras(e).cuantas}',
+              elegida: elegida == e,
+              alTocar: () => alElegir(e),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Pestana extends StatelessWidget {
+  const _Pestana({required this.texto, required this.elegida, required this.alTocar});
+
+  final String texto;
+  final bool elegida;
+  final VoidCallback alTocar;
 
   @override
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Semantics(
-          label: '$nombre: $valor, $detalle',
-          excludeSemantics: true,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(nombre, style: tema.textTheme.labelMedium?.copyWith(color: context.estados.textoSuave)),
-              const SizedBox(height: 4),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: AlignmentDirectional.centerStart,
-                child: Text(
-                  valor,
-                  style: tema.textTheme.titleLarge?.merge(cifras).copyWith(fontWeight: FontWeight.w600),
+    return Semantics(
+      selected: elegida,
+      button: true,
+      child: InkWell(
+        onTap: alTocar,
+        borderRadius: BorderRadius.circular(6),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: elegida ? tema.colorScheme.onSurface : Colors.transparent, width: 2),
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            texto,
+            style: tema.textTheme.labelLarge
+                ?.merge(cifras)
+                .copyWith(
+                  color: elegida ? tema.colorScheme.onSurface : context.estados.textoSuave,
+                  fontWeight: elegida ? FontWeight.w600 : FontWeight.w500,
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(detalle, style: tema.textTheme.bodySmall?.copyWith(color: context.estados.textoSuave)),
-            ],
           ),
         ),
       ),
@@ -234,107 +302,36 @@ class _Cifra extends StatelessWidget {
   }
 }
 
-/// Una ficha por etapa con su contador; tocarla filtra la lista.
-class _FiltroDeEtapas extends StatelessWidget {
-  const _FiltroDeEtapas({required this.embudo, required this.elegida, required this.alElegir});
-
-  final Embudo embudo;
-  final Etapa? elegida;
-  final ValueChanged<Etapa> alElegir;
-
-  @override
-  Widget build(BuildContext context) => SizedBox(
-    height: 56,
-    child: ListView.separated(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      itemCount: Etapa.values.length,
-      separatorBuilder: (_, _) => const SizedBox(width: 8),
-      itemBuilder: (context, i) {
-        final etapa = Etapa.values[i];
-        final cuantas = embudo.cifras(etapa).cuantas;
-        return FilterChip(
-          label: Text('${etapa.nombre} · $cuantas'),
-          selected: etapa == elegida,
-          onSelected: cuantas == 0 && etapa != elegida ? null : (_) => alElegir(etapa),
-        );
-      },
-    ),
-  );
-}
-
-class _Fila extends ConsumerWidget {
+class _Fila extends StatelessWidget {
   const _Fila({required this.local});
 
   final SeguimientoLocal local;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final s = local.seguimiento;
-    final tema = Theme.of(context);
-    final suave = tema.textTheme.bodySmall?.copyWith(color: context.estados.textoSuave);
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => RutaFicha(id: s.licitacionId).push<void>(context),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text(
-                      s.resumen.titulo,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: tema.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600, height: 1.3),
-                    ),
-                  ),
-                  if (local.enConflicto)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: Icon(
-                        Icons.sync_problem,
-                        size: 20,
-                        color: context.estados.pendiente,
-                        semanticLabel: 'En conflicto',
-                      ),
-                    )
-                  else if (local.pendiente)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: Icon(
-                        Icons.cloud_upload_outlined,
-                        size: 20,
-                        color: context.estados.textoSuave,
-                        semanticLabel: 'Pendiente de subir',
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(s.resumen.organo, maxLines: 1, overflow: TextOverflow.ellipsis, style: suave),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 6,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Text(
-                    euros(s.resumen.importe),
-                    style: tema.textTheme.bodyMedium?.merge(cifras).copyWith(fontWeight: FontWeight.w600),
-                  ),
-                  if (!s.etapa.cerrada) EtiquetaDePlazo(s.resumen.plazo),
-                  if (s.responsable != null) Text(s.responsable!, style: suave),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+    final Widget? indicador;
+    if (local.enConflicto) {
+      indicador = Icon(Icons.sync_problem, size: 18, color: context.estados.pendiente, semanticLabel: 'En conflicto');
+    } else if (local.pendiente) {
+      indicador = Icon(
+        Icons.cloud_upload_outlined,
+        size: 18,
+        color: context.estados.textoSuave,
+        semanticLabel: 'Pendiente de subir',
+      );
+    } else {
+      indicador = null;
+    }
+    return FilaDeLicitacion(
+      titulo: s.resumen.titulo,
+      organo: s.resumen.organo,
+      importe: s.resumen.importe,
+      // En las cerradas el plazo ya no importa: se enseña en gris como «sin plazo».
+      plazo: s.etapa.cerrada ? null : s.resumen.plazo,
+      lugar: s.responsable,
+      indicador: indicador,
+      alTocar: () => RutaFicha(id: s.licitacionId).push<void>(context),
     );
   }
 }

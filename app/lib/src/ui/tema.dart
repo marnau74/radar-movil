@@ -72,7 +72,7 @@ ThemeData temaClaro() => _tema(
     onSecondaryContainer: Color(0xFF0D1420),
     surfaceContainerLowest: Color(0xFFFFFFFF),
     surfaceContainerLow: Color(0xFFF6F7F9),
-    surfaceContainer: Color(0xFFF0F2F5),
+    surfaceContainer: Color(0xFFF1F3F6),
     surfaceContainerHigh: Color(0xFFE9EDF2),
     onSurface: Color(0xFF1C2430),
     onSurfaceVariant: Color(0xFF556070),
@@ -94,10 +94,10 @@ ThemeData temaOscuro() => _tema(
     onSecondary: Color(0xFF0D1420),
     secondaryContainer: Color(0xFF1F2C4A),
     onSecondaryContainer: Color(0xFFE5E9EF),
-    surface: Color(0xFF182029),
-    surfaceContainerLowest: Color(0xFF11161C),
-    surfaceContainerLow: Color(0xFF11161C),
-    surfaceContainer: Color(0xFF1C252F),
+    surface: Color(0xFF11161C),
+    surfaceContainerLowest: Color(0xFF0C1015),
+    surfaceContainerLow: Color(0xFF151B22),
+    surfaceContainer: Color(0xFF1A222B),
     surfaceContainerHigh: Color(0xFF262F3A),
     onSurface: Color(0xFFE5E9EF),
     onSurfaceVariant: Color(0xFF9BA7B6),
@@ -108,35 +108,71 @@ ThemeData temaOscuro() => _tema(
   ColoresDeEstado.oscuro,
 );
 
+const fuente = 'IBM Plex Sans';
+
+/// Un tema plano: listas sobre el fondo, separadas por líneas finas, sin tarjetas con borde ni sombras. La jerarquía
+/// la marcan el tamaño y el peso del texto, no las cajas.
 ThemeData _tema(Brightness brillo, ColorScheme colores, ColoresDeEstado estados) {
-  final base = ThemeData(colorScheme: colores, brightness: brillo, useMaterial3: true);
+  final base = ThemeData(colorScheme: colores, brightness: brillo, useMaterial3: true, fontFamily: fuente);
+  final texto = base.textTheme.copyWith(
+    headlineSmall: base.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600, letterSpacing: -0.4),
+    titleLarge: base.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600, letterSpacing: -0.2),
+    titleMedium: base.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+    titleSmall: base.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600, height: 1.3),
+    labelSmall: base.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600, letterSpacing: 0.8),
+  );
   return base.copyWith(
-    scaffoldBackgroundColor: colores.surfaceContainerLow,
+    textTheme: texto,
+    scaffoldBackgroundColor: colores.surface,
     extensions: [estados],
     appBarTheme: AppBarTheme(
-      backgroundColor: colores.surfaceContainerLow,
+      backgroundColor: colores.surface,
       surfaceTintColor: Colors.transparent,
       scrolledUnderElevation: 0,
       centerTitle: false,
-      titleTextStyle: base.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600, color: colores.onSurface),
+      titleTextStyle: texto.headlineSmall?.copyWith(color: colores.onSurface),
     ),
     cardTheme: CardThemeData(
       elevation: 0,
       margin: EdgeInsets.zero,
-      color: colores.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: colores.outlineVariant),
-      ),
+      color: colores.surfaceContainer,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: colores.surface,
-      indicatorColor: colores.primaryContainer,
       surfaceTintColor: Colors.transparent,
+      indicatorColor: Colors.transparent,
+      height: 64,
+      labelTextStyle: WidgetStateProperty.resolveWith(
+        (estado) => texto.labelMedium?.copyWith(
+          fontWeight: estado.contains(WidgetState.selected) ? FontWeight.w600 : FontWeight.w500,
+          color: estado.contains(WidgetState.selected) ? colores.primary : colores.onSurfaceVariant,
+        ),
+      ),
+      iconTheme: WidgetStateProperty.resolveWith(
+        (estado) =>
+            IconThemeData(color: estado.contains(WidgetState.selected) ? colores.primary : colores.onSurfaceVariant),
+      ),
     ),
-    chipTheme: base.chipTheme.copyWith(side: BorderSide(color: colores.outlineVariant)),
-    inputDecorationTheme: const InputDecorationTheme(border: OutlineInputBorder()),
-    dividerTheme: DividerThemeData(color: colores.outlineVariant, space: 1),
+    chipTheme: base.chipTheme.copyWith(
+      side: BorderSide.none,
+      backgroundColor: colores.surfaceContainer,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      labelStyle: texto.labelLarge,
+    ),
+    searchBarTheme: SearchBarThemeData(
+      elevation: const WidgetStatePropertyAll(0),
+      backgroundColor: WidgetStatePropertyAll(colores.surfaceContainer),
+      shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+      constraints: const BoxConstraints(minHeight: 48),
+      hintStyle: WidgetStatePropertyAll(texto.bodyLarge?.copyWith(color: colores.onSurfaceVariant)),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: colores.surfaceContainer,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+    ),
+    dividerTheme: DividerThemeData(color: colores.outlineVariant, space: 1, thickness: 1),
   );
 }
 

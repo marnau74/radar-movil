@@ -29,8 +29,10 @@ fuentes de verdad (ver [Capturas](#capturas)).
 - **Avisos** sin Firebase: 72 y 24 horas antes del cierre del plazo y el día de la fecha interna, programados en el
   móvil; y un aviso cuando las alertas que tienes en el radar encuentran licitaciones nuevas (tarea periódica con
   WorkManager). El permiso se pide al seguir la primera licitación, no al arrancar.
-- Tema claro y oscuro con los colores de la web del radar, cifras tabulares, textos del sistema respetados y
-  etiquetas de accesibilidad en importes y plazos.
+- Diseño plano y tipográfico con IBM Plex Sans: listas sin tarjetas, el día de cierre del plazo como la hoja de un
+  calendario (verde con margen, ámbar si cierra en tres días o menos), el embudo como una barra repartida por etapas
+  y el cambio de etapa como una línea de pasos. Tema claro y oscuro con los colores de la web del radar, cifras
+  tabulares, tamaño de letra del sistema respetado y etiquetas de accesibilidad en importes y plazos.
 
 ## Arquitectura
 
@@ -140,15 +142,16 @@ cd app && dart run build_runner build && flutter test
   (refresco único, rechazo, sin red, cancelación); repositorio con drift en memoria (cola, conflictos, cambios
   durante la subida, refresco); avisos de plazo (identificadores estables, cambio de hora); pruebas de pantallas con
   la app entera y dobles solo en los bordes (búsqueda con espera al teclear, ficha, seguir y cambiar de etapa, sin
-  red, conflicto, editor); y la tarjeta en claro y oscuro comparada píxel a píxel.
+  red, conflicto, editor); y la fila de una licitación en claro y oscuro comparada píxel a píxel.
 
 Las *golden* se generan y se comprueban en **Linux** (como en la CI): en Windows y macOS el texto se dibuja distinto y
 se saltan.
 
 ### Capturas
 
-Las capturas de arriba las genera `test/capturas/capturas_test.dart` con Roboto y los iconos de Material que trae
-Flutter, sobre las respuestas reales guardadas en `test/datos`. Se regeneran en Linux:
+Las capturas de arriba las genera `test/capturas/capturas_test.dart` con la fuente de la app y los iconos de Material
+que trae Flutter, sobre las respuestas reales guardadas en `test/datos`. Se regeneran en Linux, con la hora
+peninsular (`TZ=Europe/Madrid`):
 
 ```bash
 flutter test --run-skipped --tags capturas --update-goldens
@@ -156,4 +159,5 @@ flutter test --run-skipped --tags capturas --update-goldens
 
 ## Licencia
 
-[MIT](LICENSE)
+[MIT](LICENSE). La fuente IBM Plex Sans se distribuye con su licencia
+([SIL Open Font License](app/assets/fuentes/OFL.txt)).

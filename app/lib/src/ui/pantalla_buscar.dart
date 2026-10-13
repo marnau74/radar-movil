@@ -8,7 +8,7 @@ import 'package:radar_movil/src/red/apis.dart';
 import 'package:radar_movil/src/rutas.dart';
 import 'package:radar_movil/src/ui/comunes.dart';
 import 'package:radar_movil/src/ui/cuenta.dart';
-import 'package:radar_movil/src/ui/tema.dart';
+import 'package:radar_movil/src/ui/formato.dart';
 
 /// Buscar licitaciones en el radar. Es pública: no hace falta cuenta.
 class PantallaBuscar extends ConsumerStatefulWidget {
@@ -63,8 +63,6 @@ class _PantallaBuscarState extends ConsumerState<PantallaBuscar> {
               controller: _texto,
               hintText: 'Buscar por título, órgano o CPV',
               leading: const Icon(Icons.search),
-              elevation: const WidgetStatePropertyAll(0),
-              side: WidgetStatePropertyAll(BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
               textInputAction: TextInputAction.search,
               onChanged: _buscar,
               onSubmitted: (texto) => _buscar(texto, yaMismo: true),
@@ -82,11 +80,11 @@ class _PantallaBuscarState extends ConsumerState<PantallaBuscar> {
               ],
             ),
           ),
-          SizedBox(
-            height: 48,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+          // Desplazable: con letra grande del sistema, los dos controles no caben en una línea.
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.fromLTRB(16, 0, 8, 4),
+            child: Row(
               children: [
                 FilterChip(
                   label: const Text('Solo con plazo abierto'),
@@ -94,7 +92,7 @@ class _PantallaBuscarState extends ConsumerState<PantallaBuscar> {
                   onSelected: (valor) =>
                       ref.read(criteriosDeBusquedaProvider.notifier).cambiar(criterios.copiar(soloAbiertas: valor)),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 4),
                 _MenuDeOrden(criterios: criterios),
               ],
             ),
@@ -113,10 +111,9 @@ class _MenuDeOrden extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => MenuAnchor(
-    builder: (context, controlador, _) => ActionChip(
-      avatar: const Icon(Icons.sort, size: 18),
+    builder: (context, controlador, _) => TextButton.icon(
+      icon: const Icon(Icons.swap_vert, size: 18),
       label: Text(criterios.orden.nombre),
-      tooltip: 'Ordenar',
       onPressed: () => controlador.isOpen ? controlador.close() : controlador.open(),
     ),
     menuChildren: [
@@ -154,14 +151,15 @@ class _Resultados extends ConsumerWidget {
             return false;
           },
           child: ListView.separated(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+            padding: const EdgeInsets.only(bottom: 24),
             itemCount: value.licitaciones.length + 1,
-            separatorBuilder: (_, _) => const SizedBox(height: 10),
+            // La línea empieza donde el texto, no bajo el sello del plazo.
+            separatorBuilder: (_, i) => i == 0 ? const SizedBox.shrink() : const Divider(indent: 74),
             itemBuilder: (context, i) {
-              if (i == 0) return _Total(total: value.total);
+              if (i == 0) return Encabezado(value.total == 1 ? '1 licitación' : '${entero(value.total)} licitaciones');
               final l = value.licitaciones[i - 1];
-              return TarjetaDeLicitacion(
-                licitacion: l,
+              return FilaDeLicitacion.deResumen(
+                l,
                 etapa: etapas[l.id],
                 alTocar: () => RutaFicha(id: l.id).push<void>(context),
               );
@@ -173,16 +171,4 @@ class _Resultados extends ConsumerWidget {
       _ => const Center(child: CircularProgressIndicator()),
     };
   }
-}
-
-class _Total extends StatelessWidget {
-  const _Total({required this.total});
-
-  final int total;
-
-  @override
-  Widget build(BuildContext context) => Text(
-    total == 1 ? '1 licitación' : '$total licitaciones',
-    style: Theme.of(context).textTheme.labelLarge?.copyWith(color: context.estados.textoSuave),
-  );
 }

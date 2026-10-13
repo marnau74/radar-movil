@@ -9,7 +9,8 @@ Primera versión.
 
 ### Añadido
 
-- App de Android en Flutter: búsqueda y ficha de licitaciones contra la API del radar.
+- App de Android en Flutter: búsqueda y ficha de licitaciones contra la API del radar, con diseño propio (IBM
+  Plex Sans, listas planas, sello de plazo, embudo en barra y etapas por pasos).
 - Inicio de sesión con la cuenta de Keycloak del radar (código + PKCE) y tokens cifrados.
 - Seguimiento de ofertas por etapas con notas, responsable y fecha interna; embudo con importe en juego y tasa de
   éxito.
