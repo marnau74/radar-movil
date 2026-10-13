@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  servidor:
+    name: Servidor (Dart + MongoDB)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: servidor
+    services:
+      mongo:
+        image: mongo:8.0
+        ports:
+          - 27019:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand(\"ping\").ok'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
+        with:
+          sdk: 3.13.5
+      - run: dart pub get
+      - run: dart format --output=none --set-exit-if-changed .
+      - run: dart analyze --fatal-infos
+      - run: dart test
+        env:
+          RADAR_MOVIL_MONGO_PRUEBAS: mongodb://localhost:27019
+      - name: Imagen Docker
+        run: docker build --tag radar-movil-servidor .
+
+  app:
+    name: App (Flutter)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.47.7
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Código generado (freezed, json_serializable, drift, riverpod, go_router)
+        run: dart run build_runner build
+      - name: Formato
+        run: dart format --output=none --set-exit-if-changed $(git ls-files '*.dart')
+      - run: flutter analyze --fatal-infos
+      # En Linux también se comparan las imágenes de referencia (golden), que se generan en Linux.
+      - run: flutter test
+      - run: flutter build apk --debug

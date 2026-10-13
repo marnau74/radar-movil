@@ -1,0 +1,25 @@
+version: 2
+updates:
+  - package-ecosystem: pub
+    directory: /servidor
+    schedule:
+      interval: weekly
+  - package-ecosystem: pub
+    directory: /app
+    schedule:
+      interval: weekly
+    groups:
+      generadores:
+        patterns: ["build_runner", "freezed*", "json_*", "drift*", "riverpod*", "go_router*"]
+  - package-ecosystem: gradle
+    directory: /app/android
+    schedule:
+      interval: monthly
+  - package-ecosystem: docker
+    directory: /servidor
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
