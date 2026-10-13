@@ -1,0 +1,198 @@
+{
+  "id": 20622372,
+  "expediente": "432026PA1003",
+  "titulo": "Contratar la prestación de servicios especializados de apoyo a la actividad asistencial y formativa de la Dirección Provincial del Instituto Social de la Marina de Tarragona",
+  "url": "https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&idEvl=YbJP%2FJRt8%2BAzjChw4z%2FXvw%3D%3D",
+  "estado": {
+    "codigo": "PUB",
+    "nombre": "Publicada"
+  },
+  "tipoContrato": {
+    "codigo": "2",
+    "nombre": "Servicios"
+  },
+  "subtipoContrato": "27",
+  "procedimiento": {
+    "codigo": "9",
+    "nombre": "Abierto simplificado"
+  },
+  "organo": {
+    "id": 2,
+    "nombre": "Instituto Social de la Marina -Dirección Provincial de Tarragona",
+    "nif": "Q4369006D",
+    "dir3": "EA0021284",
+    "tipo": {
+      "codigo": "1",
+      "nombre": "Autoridad estatal"
+    },
+    "ciudad": "Tarragona",
+    "codigoPostal": "43005",
+    "web": null,
+    "perfilContratante": "https://contrataciondelestado.es/wps/poc?uri=deeplink:perfilContratante&idBp=zf3BtZcAGuYQK2TEfXGy%2BA%3D%3D",
+    "jerarquia": [
+      "Dirección Provincial del ISM de Tarragona",
+      "Instituto Social de la Marina -ISM-",
+      "Secretaria de Estado de la Seguridad Social y Pensiones",
+      "Ministerio de Inclusión, Seguridad Social y Migraciones",
+      "ADMINISTRACIÓN GENERAL DEL ESTADO",
+      "Sector Público"
+    ]
+  },
+  "importeSinIva": 47775.0,
+  "importeConIva": 47775.0,
+  "valorEstimado": 95550.0,
+  "cpv": [
+    {
+      "codigo": "85140000",
+      "nombre": "Servicios varios de salud"
+    },
+    {
+      "codigo": "80560000",
+      "nombre": "Servicios de formación en materia de salud y primeros auxilios"
+    }
+  ],
+  "nuts": {
+    "codigo": "ES514",
+    "nombre": "Tarragona"
+  },
+  "lugar": "Tarragona",
+  "plazoPresentacion": "2026-10-19T21:59:00Z",
+  "fechaPublicacion": "2026-10-05",
+  "duracion": "12 meses",
+  "financiacionUe": false,
+  "anulada": false,
+  "lotes": [
+    {
+      "numero": "1",
+      "objeto": "Centro de Sanidad Marítima de Tarragona",
+      "importeSinIva": 69000.0,
+      "cpv": [
+        {
+          "codigo": "85140000",
+          "nombre": "Servicios varios de salud"
+        },
+        {
+          "codigo": "80560000",
+          "nombre": "Servicios de formación en materia de salud y primeros auxilios"
+        }
+      ],
+      "nuts": {
+        "codigo": "ES514",
+        "nombre": "Tarragona"
+      }
+    },
+    {
+      "numero": "2",
+      "objeto": "Centro de Sanidad Marítima de La Ràpita",
+      "importeSinIva": 8400.0,
+      "cpv": [
+        {
+          "codigo": "85140000",
+          "nombre": "Servicios varios de salud"
+        },
+        {
+          "codigo": "80560000",
+          "nombre": "Servicios de formación en materia de salud y primeros auxilios"
+        }
+      ],
+      "nuts": {
+        "codigo": "ES514",
+        "nombre": "Tarragona"
+      }
+    },
+    {
+      "numero": "3",
+      "objeto": "Aulas de formación en Tarragona y en La Ràpita.",
+      "importeSinIva": 18150.0,
+      "cpv": [
+        {
+          "codigo": "85140000",
+          "nombre": "Servicios varios de salud"
+        },
+        {
+          "codigo": "80560000",
+          "nombre": "Servicios de formación en materia de salud y primeros auxilios"
+        }
+      ],
+      "nuts": {
+        "codigo": "ES514",
+        "nombre": "Tarragona"
+      }
+    }
+  ],
+  "resultados": [],
+  "documentos": [
+    {
+      "tipo": "PLIEGO_ADMINISTRATIVO",
+      "nombre": "04 PCAP Serv Especializados Sanitario firmado_signed.pdf",
+      "url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=yjNJvNCIpaLjXfAAu4DhDLxpMmO3ANTNaeJVWD495OuTuNFqRmBU7ahXHjTkjPaoIUs9aY6%2BigDITVMqqRtqgvDfaJWViJkhNMFEOzUD3d33GVhXrFFqN7yFncy7YfRK"
+    },
+    {
+      "tipo": "PLIEGO_TECNICO",
+      "nombre": "05 PPT Serv Especializados Sanitario_signed.pdf",
+      "url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=t2Hw%2BP9tc7BqIhAy0OCDHQ8E/8eDaUXWDaCwvJuJSO3wJjxx02aOH7Y73bZY%2BLDR2FwHo8d3z1lBNr9RRqsfkScodbPCYkrwTUP6xmWbOUD3GVhXrFFqN7yFncy7YfRK"
+    },
+    {
+      "tipo": "OTRO",
+      "nombre": "4 Anexo 1 C.pdf",
+      "url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=KEQOjlLP%2BraAPIKLr8TrVG4NbilUkCnJ2twXXkPd2VokdGnXceW/8qWoYJF4%2BX%2B3o28980HwAzbi1jRO75lDSW%2BAh2zq9YKUG6tuHYIs/MTDdQD9RyhUmzT4jZ2In4zL"
+    },
+    {
+      "tipo": "OTRO",
+      "nombre": "4 Anexo 1 A.pdf",
+      "url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=mXy1q4Uo/XWi5tg%2BgVHhHBMPL9sNCgAzXt2emldZdERXRw8/qQ2J2FNiwC9E8h9HptSBuPngV49nuNqsJ/iFygQxF3VXue4YJZ2vdvQyfEOB0nvVKRzfe4rpHcnlPhSZ"
+    },
+    {
+      "tipo": "OTRO",
+      "nombre": "4 Anexo 2.pdf",
+      "url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=67gXogtCW7pohIDRDHQP4vJdqX42VC7xXqmm0EY7eL7YhErMeRueIAxIegx6tpBVhceiRrir91e8h2XuCZtFgigxHjYIfcgoBV5f0MlM0C17QB3HKyQaFUExmUVQCerk"
+    },
+    {
+      "tipo": "OTRO",
+      "nombre": "6 Resolucion modificacion pliegos tipo.pdf",
+      "url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=NREgUePKjxR90okc3Isc%2B5qbkGpYoXM2SAohLm1J5OLNsLdrp5aQYc7lMHzr8UtHaDbZu27CIX4yvtkEcoMaUoYisfFOptsyq8cb906v2X21aXEvq3KHa/AEHgtDrQw0"
+    },
+    {
+      "tipo": "OTRO",
+      "nombre": "6 Pliego Tipo Servicios- abierto y abierto simplificado.pdf",
+      "url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=F/zeQyQaDMfYqvuSUOoP8DXEbRKjor1nC55ZtWdYKGVkJzL3lDNJo%2BnU5Oz8kYuDJiG03G7%2B1w3CZPpHlZsQEDfgMVVjcJk%2BwWywOam20Q5t/o8fNevwsujgRzaBbugn"
+    },
+    {
+      "tipo": "OTRO",
+      "nombre": "4 Anexo 4.pdf",
+      "url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=LJ13Ga5khgjYvowFQJ6MkurfWVnKLThaAW%2BlS%2BQ//DlIM0Vs6zefvAaryzB38ELISkvLeU2pUp/G187eWTUTno52CXOWjp6aMUoPa8TrF/h7QB3HKyQaFUExmUVQCerk"
+    },
+    {
+      "tipo": "OTRO",
+      "nombre": "4 Anexo 1 B.pdf",
+      "url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=reBvho4ePtpSRDtfwJKLmp0UaeXBF4XaTSSbtNfytGt7hu1OuxFFLidMfTTZsfTwueERB41NtD7QlA1aIyHvIrCqEgX%2BbPBQRCAMKGjbBVyHAj0WEJrB5sP7amrh2jBD"
+    },
+    {
+      "tipo": "OTRO",
+      "nombre": "4 Anexo 3.pdf",
+      "url": "https://contrataciondelestado.es/FileSystem/servlet/GetDocumentByIdServlet?cifrado=QUC1GjXXSiLkydRHJBmbpw%3D%3D&DocumentIdParam=5X7lOCvKPCoakYpRSS3I3QUkmAddK38s4d5i6YHOFz/gqp/riohXTBRtNht0FtPgtiLKl1B3WiwRP9jmtcz5sFrqupC3rhv%2B4bQPvjEo1tAC1/zDIE0Kw/PWNnLS0Z0z"
+    },
+    {
+      "tipo": "OTRO",
+      "nombre": "Documento de aprobación del expediente",
+      "url": "https://contrataciondelestado.es/wps/wcm/connect/PLACE_es/Site/area/docAccCmpnt?srv=cmpnt&cmpntname=GetDocumentsById&source=library&DocumentIdParam=2026-c01a57fb-b826-4d1c-a2e0-2e0a61c05fcf"
+    },
+    {
+      "tipo": "OTRO",
+      "nombre": "Memoria justificativa",
+      "url": "https://contrataciondelestado.es/wps/wcm/connect/PLACE_es/Site/area/docAccCmpnt?srv=cmpnt&cmpntname=GetDocumentsById&source=library&DocumentIdParam=2026-46e28699-6004-45cc-9205-aaa9da26ae53"
+    },
+    {
+      "tipo": "OTRO",
+      "nombre": "Acuerdo de iniciación del expediente",
+      "url": "https://contrataciondelestado.es/wps/wcm/connect/PLACE_es/Site/area/docAccCmpnt?srv=cmpnt&cmpntname=GetDocumentsById&source=library&DocumentIdParam=2026-2ad91f00-25de-4a8c-b8d5-5f2a7ebfbc30"
+    },
+    {
+      "tipo": "OTRO",
+      "nombre": "Informe de insuficiencia de medios",
+      "url": "https://contrataciondelestado.es/wps/wcm/connect/PLACE_es/Site/area/docAccCmpnt?srv=cmpnt&cmpntname=GetDocumentsById&source=library&DocumentIdParam=2026-93416b39-e835-4e50-aa06-86a9a5e0c4b7"
+    }
+  ],
+  "actualizadaEn": "2026-10-05T17:56:29.424Z",
+  "vistaPorPrimeraVez": "2026-10-13T18:38:28.818499Z"
+}

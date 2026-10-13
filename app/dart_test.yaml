@@ -1,0 +1,10 @@
+tags:
+  # Comparan píxeles: las imágenes de referencia son de Linux (las mismas que en la CI). En Windows y macOS el texto se
+  # dibuja con otro suavizado y no coincidirían.
+  golden:
+    on_platform:
+      windows || mac-os:
+        skip: "Las imágenes de referencia se generan y comprueban en Linux"
+  # Generan las capturas del README; no se ejecutan con el resto (ver test/capturas).
+  capturas:
+    skip: "Solo se ejecutan a mano para regenerar las capturas"

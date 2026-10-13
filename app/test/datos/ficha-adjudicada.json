@@ -1,0 +1,76 @@
+{
+  "id": 20622385,
+  "expediente": "2026049161",
+  "titulo": "Contrato basado AM AMTEGA Servicios Cloud Pública: Migración del ecosistema Tourist INSIDE RIAS BAIXAS a Cloud Pública",
+  "url": "https://contrataciondelestado.es/wps/poc?uri=deeplink:detalle_licitacion&idEvl=X1EIRaDxU5Rt5r0ngvMetA%3D%3D",
+  "estado": {
+    "codigo": "RES",
+    "nombre": "Resuelta"
+  },
+  "tipoContrato": {
+    "codigo": "2",
+    "nombre": "Servicios"
+  },
+  "subtipoContrato": "7",
+  "procedimiento": {
+    "codigo": "7",
+    "nombre": "Derivado de acuerdo marco"
+  },
+  "organo": {
+    "id": 4,
+    "nombre": "Presidencia de la Diputación Provincial de Pontevedra",
+    "nif": "P3600000H",
+    "dir3": null,
+    "tipo": {
+      "codigo": "3",
+      "nombre": "Autoridad local"
+    },
+    "ciudad": "Pontevedra",
+    "codigoPostal": "36071",
+    "web": "http://www.depo.es",
+    "perfilContratante": "https://contrataciondelestado.es/wps/poc?uri=deeplink:perfilContratante&idBp=M7XB0CBT%2B%2F4QK2TEfXGy%2BA%3D%3D",
+    "jerarquia": [
+      "ENTIDADES LOCALES",
+      "Sector Público"
+    ]
+  },
+  "importeSinIva": 58751.0,
+  "importeConIva": 71088.71,
+  "valorEstimado": 58751.0,
+  "cpv": [
+    {
+      "codigo": "72250000",
+      "nombre": "Servicios de sistemas y apoyo"
+    }
+  ],
+  "nuts": {
+    "codigo": "ES114",
+    "nombre": "Pontevedra"
+  },
+  "lugar": "Pontevedra",
+  "plazoPresentacion": null,
+  "fechaPublicacion": "2026-10-05",
+  "duracion": "12 meses",
+  "financiacionUe": false,
+  "anulada": false,
+  "lotes": [],
+  "resultados": [
+    {
+      "lote": null,
+      "resultado": {
+        "codigo": "8",
+        "nombre": "Adjudicado"
+      },
+      "fechaAdjudicacion": "2026-09-24",
+      "ofertasRecibidas": 1,
+      "adjudicatario": "ATOS IT SOLUTIONS AND SERVICES IBERIA, S.L.",
+      "adjudicatarioNif": "B85908093",
+      "importeSinIva": 58751.0,
+      "importeConIva": 71088.71,
+      "pyme": false
+    }
+  ],
+  "documentos": [],
+  "actualizadaEn": "2026-10-05T16:52:42.918Z",
+  "vistaPorPrimeraVez": "2026-10-13T18:38:28.818499Z"
+}

@@ -1,0 +1,10 @@
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          explicit_to_json: true
+          field_rename: none
+      drift_dev:
+        options:
+          store_date_time_values_as_text: true

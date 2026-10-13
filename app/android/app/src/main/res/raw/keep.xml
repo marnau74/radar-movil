@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- R8 no ve que los avisos usan este icono por su nombre: sin esto lo quitaría de la versión de release. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@drawable/ic_aviso" />

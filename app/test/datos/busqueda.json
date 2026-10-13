@@ -1,0 +1,72 @@
+{
+  "elementos": [
+    {
+      "id": 20622385,
+      "expediente": "2026049161",
+      "titulo": "Contrato basado AM AMTEGA Servicios Cloud Pública: Migración del ecosistema Tourist INSIDE RIAS BAIXAS a Cloud Pública",
+      "estado": "RES",
+      "tipoContrato": "2",
+      "procedimiento": "7",
+      "organoId": 4,
+      "organo": "Presidencia de la Diputación Provincial de Pontevedra",
+      "importeSinIva": 58751.0,
+      "plazoPresentacion": null,
+      "fechaPublicacion": "2026-10-05",
+      "nuts": "ES114",
+      "lugar": "Pontevedra",
+      "cpv": [
+        "72250000"
+      ],
+      "numLotes": 0,
+      "financiacionUe": false,
+      "anulada": false
+    },
+    {
+      "id": 20622376,
+      "expediente": "110/2026",
+      "titulo": "Prórroga del contrato de suministro de útiles y maquinaria 154/2025",
+      "estado": "ADJ",
+      "tipoContrato": "1",
+      "procedimiento": "3",
+      "organoId": 9,
+      "organo": "Consejo de Administración de la Empresa Municipal Serveis de Alcoi S.L.",
+      "importeSinIva": 0.0,
+      "plazoPresentacion": null,
+      "fechaPublicacion": "2026-10-05",
+      "nuts": "ES521",
+      "lugar": "Alicante/Alacant",
+      "cpv": [
+        "42000000"
+      ],
+      "numLotes": 0,
+      "financiacionUe": false,
+      "anulada": false
+    },
+    {
+      "id": 20622372,
+      "expediente": "432026PA1003",
+      "titulo": "Contratar la prestación de servicios especializados de apoyo a la actividad asistencial y formativa de la Dirección Provincial del Instituto Social de la Marina de Tarragona",
+      "estado": "PUB",
+      "tipoContrato": "2",
+      "procedimiento": "9",
+      "organoId": 2,
+      "organo": "Instituto Social de la Marina -Dirección Provincial de Tarragona",
+      "importeSinIva": 47775.0,
+      "plazoPresentacion": "2026-10-19T21:59:00Z",
+      "fechaPublicacion": "2026-10-05",
+      "nuts": "ES514",
+      "lugar": "Tarragona",
+      "cpv": [
+        "85140000",
+        "80560000"
+      ],
+      "numLotes": 3,
+      "financiacionUe": false,
+      "anulada": false
+    }
+  ],
+  "pagina": 1,
+  "tamano": 3,
+  "total": 4,
+  "paginas": 2
+}
