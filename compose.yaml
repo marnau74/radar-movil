@@ -1,0 +1,44 @@
+# Entorno local del seguimiento: MongoDB y el servidor. El radar (API, Keycloak y la web) se arranca desde su propio
+# repositorio, con `docker compose -f compose.e2e.yaml up -d --build --wait`, y queda en http://localhost:8088.
+#
+#   docker compose up -d --build --wait
+#   ./infra/keycloak/cliente-radar-movil.sh     # una vez: da de alta la app en el Keycloak del radar
+#
+# El servidor queda en http://localhost:8090 y MongoDB en localhost:27019 (también lo usan las pruebas).
+name: radar-movil
+
+services:
+  mongo:
+    image: mongo:8.0
+    ports:
+      - "27019:27017"
+    volumes:
+      - datos-mongo:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  servidor:
+    build: ./servidor
+    environment:
+      RADAR_MOVIL_MONGO_URL: mongodb://mongo:27017/radar_movil
+      # El emisor es la URL pública de Keycloak (la que ve el móvil); las claves se piden por el host.
+      RADAR_OIDC_EMISOR: http://localhost:8088/auth/realms/radar
+      RADAR_OIDC_JWKS: http://host.docker.internal:8088/auth/realms/radar/protocol/openid-connect/certs
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8090:8090"
+    healthcheck:
+      test: ["CMD", "/app/servidor", "salud"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+volumes:
+  datos-mongo:

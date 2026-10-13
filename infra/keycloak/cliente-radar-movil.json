@@ -1,0 +1,29 @@
+{
+  "clientId": "radar-movil",
+  "name": "Radar de licitaciones (móvil)",
+  "enabled": true,
+  "publicClient": true,
+  "standardFlowEnabled": true,
+  "directAccessGrantsEnabled": false,
+  "implicitFlowEnabled": false,
+  "protocol": "openid-connect",
+  "redirectUris": ["es.radarlicitaciones.movil:/oauth2redirect"],
+  "attributes": {
+    "pkce.code.challenge.method": "S256",
+    "post.logout.redirect.uris": "es.radarlicitaciones.movil:/oauth2redirect"
+  },
+  "protocolMappers": [
+    {
+      "name": "audiencia radar-api",
+      "protocol": "openid-connect",
+      "protocolMapper": "oidc-audience-mapper",
+      "config": {"included.custom.audience": "radar-api", "access.token.claim": "true", "id.token.claim": "false"}
+    },
+    {
+      "name": "roles del realm",
+      "protocol": "openid-connect",
+      "protocolMapper": "oidc-usermodel-realm-role-mapper",
+      "config": {"claim.name": "roles", "multivalued": "true", "access.token.claim": "true", "id.token.claim": "false", "userinfo.token.claim": "false"}
+    }
+  ]
+}
