@@ -157,7 +157,22 @@ class Sesion {
       await _fijar(nuevos);
       return nuevos;
     } on RefrescoRechazado {
+      // La tarea en segundo plano corre en otro isolate con su propia copia de la sesión: si ha refrescado ella,
+      // Keycloak puede haber invalidado este token de refresco, pero los nuevos ya están en el almacén.
+      final guardados = await _guardados();
+      if (guardados != null && guardados.refresco != refresco) {
+        _tokens = guardados;
+        return guardados;
+      }
       await _fijar(null);
+      return null;
+    }
+  }
+
+  Future<Tokens?> _guardados() async {
+    try {
+      return await _almacen.leer();
+    } on Object {
       return null;
     }
   }

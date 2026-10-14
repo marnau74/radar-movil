@@ -41,6 +41,17 @@ void main() {
       );
     });
 
+    test('un campo de otro tipo es un dato no válido, no un error del servidor', () {
+      final cuerpo = cambioValido()..['etapa'] = 3;
+      (cuerpo['resumen'] as Map<String, dynamic>)['expediente'] = 42;
+      expect(
+        () => CambioDeSeguimiento.validar(cuerpo),
+        throwsA(
+          isA<DatoNoValido>().having((e) => e.errores.keys, 'campos', containsAll(['etapa', 'resumen.expediente'])),
+        ),
+      );
+    });
+
     test('un cuerpo que no es un objeto se rechaza', () {
       expect(() => CambioDeSeguimiento.validar([1, 2]), throwsA(isA<DatoNoValido>()));
     });

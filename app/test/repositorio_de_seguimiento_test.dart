@@ -162,6 +162,19 @@ void main() {
     expect(await base.select(base.seguimientosLocales).get(), isEmpty);
   });
 
+  test('volver a seguir algo que se dejó de seguir sin red lo sube sobre la versión del servidor', () async {
+    servidorAcepta();
+    await base.into(base.seguimientosLocales).insert(_fila(seguimiento(1, version: 2), EstadoLocal.sincronizado));
+    await repositorio.dejarDeSeguir(1);
+    await repositorio.guardar(seguimiento(1));
+    await repositorio.sincronizar();
+
+    verifyNever(() => api.borrar(any()));
+    final subido = verify(() => api.guardar(captureAny())).captured.single as Seguimiento;
+    expect(subido.version, 2);
+    expect((await repositorio.todos()).single.estado, EstadoLocal.sincronizado);
+  });
+
   test('dos sincronizaciones a la vez suben cada cambio una sola vez', () async {
     servidorAcepta();
     await repositorio.guardar(seguimiento(1));

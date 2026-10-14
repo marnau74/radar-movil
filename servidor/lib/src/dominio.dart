@@ -147,6 +147,10 @@ class CambioDeSeguimiento {
       if (importe != null && (importe is! num || importe < 0)) {
         errores['resumen.importe'] = 'El importe tiene que ser un número no negativo';
       }
+      final expediente = resumen['expediente'];
+      if (expediente != null && (expediente is! String || expediente.length > 200)) {
+        errores['resumen.expediente'] = 'El expediente es texto (como mucho 200 caracteres)';
+      }
       if (resumen['plazo'] != null && _fechaOpcional(resumen['plazo']) == null) {
         errores['resumen.plazo'] = 'El plazo tiene que ser una fecha ISO 8601';
       }
@@ -154,7 +158,8 @@ class CambioDeSeguimiento {
         resumenLeido = ResumenDeLicitacion.desdeJson(resumen);
       }
     }
-    final etapa = Etapa.deTexto(cuerpo['etapa'] as String?);
+    final textoDeEtapa = cuerpo['etapa'];
+    final etapa = textoDeEtapa is String ? Etapa.deTexto(textoDeEtapa) : null;
     if (etapa == null) {
       errores['etapa'] = 'Etapa no válida: ${Etapa.values.map((e) => e.name).join(', ')}';
     }

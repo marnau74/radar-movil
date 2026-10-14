@@ -38,6 +38,10 @@ class ProveedorFalso implements ProveedorDeIdentidad {
   int refrescos = 0;
   int cierres = 0;
   bool rechazarRefresco = false;
+
+  /// Como Keycloak con la rotación de tokens de refresco: cada uno sirve una sola vez.
+  bool unSoloUso = false;
+  final _usados = <String>{};
   bool sinRed = false;
   bool cancelar = false;
 
@@ -60,6 +64,7 @@ class ProveedorFalso implements ProveedorDeIdentidad {
     await Future<void>.delayed(const Duration(milliseconds: 10));
     if (sinRed) throw const SocketException('Sin red');
     if (rechazarRefresco) throw const RefrescoRechazado();
+    if (unSoloUso && !_usados.add(refresco)) throw const RefrescoRechazado();
     refrescos++;
     return tokens('usuario-ana');
   }

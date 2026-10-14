@@ -75,6 +75,10 @@ class RepositorioDeSeguimientos {
 
     final actual = await uno(usuario, licitacionId);
     if (actual == null) throw Conflicto('Este seguimiento ya no existe', null);
+    // Sin esta comprobación, el historial anotaría el paso desde la etapa de una versión que no es la editada.
+    if (actual.version != cambio.version) {
+      throw Conflicto('Lo ha cambiado otro dispositivo: revisa la versión guardada', actual);
+    }
     var modificacion = modify
         .set('resumen', _resumen(cambio.resumen))
         .set('etapa', cambio.etapa.name)

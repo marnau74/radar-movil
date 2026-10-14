@@ -64,6 +64,20 @@ void main() {
     expect(cambios, [null]);
   });
 
+  test('si otro isolate ya ha refrescado, se usan sus tokens en vez de cerrar la sesión', () async {
+    await sesion.iniciar();
+    proveedor.unSoloUso = true;
+    final tarea = Sesion(proveedor, almacen, reloj: () => ahora);
+    await tarea.cargar();
+    ahora = ahora.add(const Duration(minutes: 10));
+
+    final deLaTarea = await tarea.token();
+    final deLaApp = await sesion.token();
+    expect(deLaApp, deLaTarea);
+    expect(sesion.usuario, isNotNull);
+    expect(almacen.tokens, isNotNull);
+  });
+
   test('sin red, el refresco falla pero la sesión sigue', () async {
     await sesion.iniciar();
     proveedor.sinRed = true;

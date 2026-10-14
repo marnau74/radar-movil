@@ -75,7 +75,12 @@ class RepositorioDeSeguimiento {
     if (actual?.estado == EstadoLocal.conflicto) {
       throw StateError('Hay que resolver el conflicto antes de volver a cambiarlo');
     }
-    await _escribir(seguimiento, EstadoLocal.pendiente);
+    // Se ha vuelto a seguir algo que se había dejado de seguir sin red: en el servidor sigue existiendo, así que el
+    // seguimiento nuevo se sube sobre esa versión (sin ella, el servidor respondería que ya se sigue).
+    final aSubir = actual?.estado == EstadoLocal.borrando && seguimiento.version == null
+        ? seguimiento.copyWith(version: _leer(actual!).seguimiento.version)
+        : seguimiento;
+    await _escribir(aSubir, EstadoLocal.pendiente);
   }
 
   Future<void> dejarDeSeguir(int licitacionId) async {
