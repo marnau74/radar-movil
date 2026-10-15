@@ -15,6 +15,8 @@ Las licitaciones de las capturas son reales (la muestra del feed de la Plataform
 radar); las etapas, la responsable y la nota son de ejemplo. Las pantallas se pintan desde una prueba con las
 fuentes de verdad (ver [Capturas](#capturas)).
 
+> **In English.** Android app for companies bidding on public tenders: search the tender radar, follow the tenders you care about and move them through your own bid pipeline (interested, preparing, submitted, won or lost) with notes, owner, internal deadline and reminders before the deadline. Works offline and syncs through its own Dart server with MongoDB; sign-in with Keycloak (OIDC + PKCE). Flutter, Riverpod, go_router and drift.
+
 ## Qué hace
 
 - **Buscar** licitaciones en la API pública del radar (texto, solo con plazo abierto, cuatro órdenes) con paginación
