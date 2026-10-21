@@ -13,7 +13,7 @@ dependencies:
   mongo_dart: ^0.10.10
   path: ^1.9.0
   shelf: ^1.4.2
-  shelf_router: ^1.1.4
+  shelf_router: ^1.1.5
 
 dev_dependencies:
   test: ^1.33.0
