@@ -1,5 +1,5 @@
 # Compilación a un ejecutable nativo y una imagen mínima con solo lo que necesita para arrancar.
-FROM dart:3.13.5 AS compilacion
+FROM dart:3.13.6 AS compilacion
 WORKDIR /app
 COPY pubspec.yaml pubspec.lock ./
 RUN dart pub get
